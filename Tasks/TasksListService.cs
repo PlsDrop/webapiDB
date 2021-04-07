@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace webapi
 {
@@ -15,7 +16,7 @@ namespace webapi
 
         public List<TasksList> GetLists()
         {
-            return _context.taskLists.ToList<TasksList>();
+            return _context.taskLists.ToList();
         }
 
         internal TasksList CreateList(string name)
