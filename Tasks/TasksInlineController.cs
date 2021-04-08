@@ -39,7 +39,7 @@ namespace webapi
             return tasksListService.GetTaskList(listId, all); 
         }
 
-        [HttpPost("/inline/lists/{listId}/tasks")]
+        [HttpPut("/inline/lists/{listId}/tasks")]
         public ActionResult<Task> AddTask(int listId, Task task)
         {   
             // if (ModelState.IsValid)
@@ -51,14 +51,14 @@ namespace webapi
             // return StatusCodes.
         }
         
-        [HttpPatch("/inline/lists/{listId}")]
+        [HttpPut("/inline/lists/{listId}")]
         public ActionResult<TasksList> PatchList(int listId, string name)
         {
             TasksList updatedList = tasksListService.PatchList(listId, name);
             return Created($"/lists/{updatedList.tasksListId}", updatedList);
         }
 
-        [HttpPatch("/inline/lists/{listId}/tasks/{taskId}")]
+        [HttpPut("/inline/lists/{listId}/tasks/{taskId}")]
         public ActionResult<Task> PatchTask(int listId, int taskId, Task task)
         {
             Task updatedTask = tasksListService.PatchTask(listId, taskId, task);
