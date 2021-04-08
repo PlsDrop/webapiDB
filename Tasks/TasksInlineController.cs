@@ -35,7 +35,8 @@ namespace webapi
         [HttpGet("/inline/lists/{listId}/tasks")]
         public IEnumerable<Task> GetTaskList(int listId)
         {
-            return tasksListService.GetTaskList(listId); 
+            bool all = bool.Parse(Request.Query["all"]);
+            return tasksListService.GetTaskList(listId, all); 
         }
 
         [HttpPost("/inline/lists/{listId}/tasks")]
@@ -71,6 +72,18 @@ namespace webapi
         {
             tasksListService.DeleteTask(listId, taskId);
             return Ok($"/inline/lists/{listId}/tasks/{taskId}");
+        }
+
+        [HttpGet("/dashboard")]
+        public DashboardDTO GetDashboard()
+        {
+            return tasksListService.GetDashboard();
+        }
+
+        [HttpGet("/collection/today")]
+        public IEnumerable<TodayTaskDTO> GetTodayTasks()
+        {
+            return tasksListService.GetTodayTasks();
         }
     }
 }
