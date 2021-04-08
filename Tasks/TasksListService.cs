@@ -83,37 +83,87 @@ namespace webapi
 
         internal List<TodayTaskDTO> GetTodayTasks()
         {
-            List<TodayTaskDTO> list = new List<TodayTaskDTO>();
-            var tasks = _context.tasks.Where(b => b.dueDate.Value.Day == DateTime.Today.Day).Include(t => t.tasksList);
-            foreach (var item in tasks.ToList())
-            {
-                TodayTaskDTO taskDTO = new TodayTaskDTO();
-                taskDTO.listName = item.tasksList.title;
-                item.tasksList = null;
-                taskDTO.task = item;
-                list.Add(taskDTO);
-            }
-            return list;
+            return _context.tasks
+                .Where(b => b.dueDate.Value.Date == DateTime.Today.Date)
+                .Include(t => t.tasksList)
+                .Select(ToTodayTaskDTO)
+                .ToList();
+        }
+
+        private TodayTaskDTO ToTodayTaskDTO(Task task)
+        {   
+            TodayTaskDTO taskDTO = new TodayTaskDTO();
+            taskDTO.listName = task.tasksList.title;
+            task.tasksList = null;
+            taskDTO.task = task;
+            return taskDTO;
         }
 
         internal DashboardDTO GetDashboard()
         {
-            DashboardDTO dashboardDTO = new DashboardDTO();
-            dashboardDTO.todayTasks = _context.tasks.Where(b => b.dueDate.Value.Day == DateTime.Today.Day).Count();
-            dashboardDTO.taskLists = new List<TasksListDTO>();
-            foreach(var item in _context.tasks.Where(t => t.done == false).AsEnumerable().GroupBy(t => t.tasksListId))
+            List<TasksListDTO> list = new List<TasksListDTO>();
+            using (var command = _context.Database.GetDbConnection().CreateCommand())
             {
-                TasksListDTO tasksListDTO = new TasksListDTO()
+                command.CommandText = "select l.tasks_list_id, l.title, Count(t.done) from tasks t right join task_lists l on l.tasks_list_id=t.tasks_list_id  where t.done=false group by l.tasks_list_id, l.title";
+                _context.Database.OpenConnection();
+                using (var result = command.ExecuteReader())
                 {
-                    notDoneTasks = item.Count(), 
-                    tasksList = _context.taskLists
-                    .Where(l => l.tasksListId == item.Key)
-                    .Single() 
-                };
-                tasksListDTO.tasksList.tasks = null;
-                dashboardDTO.taskLists.Add(tasksListDTO);            
-            }
-            return dashboardDTO;
+                    while (result.Read())
+                    {
+                        list.Add(new TasksListDTO()
+                        {
+                            id = result.GetInt32(0),
+                            title = result.IsDBNull(1) ? null : result.GetString(1),
+                            notDoneTasks = result.GetInt32(2)
+                        });
+                    }
+                }
+            }        
+            DashboardDTO outp = new DashboardDTO()
+            {
+                todayTasks = _context.tasks.Where(b => b.dueDate == DateTime.Today).Count(),
+                taskLists = list
+            };
+            return outp;
+            
+            
+            
+            
+            
+            
+            
+            
+            // DashboardDTO dashboardDTO = new DashboardDTO();
+            // dashboardDTO.todayTasks = _context.tasks.Where(b => b.dueDate.Value.Date == DateTime.Today.Date).Count();
+            // dashboardDTO.taskLists = _context.tasks
+            //     .Where(t => t.done == false)
+            //     .AsEnumerable()
+            //     .GroupBy(t => t.tasksListId)
+            //     .Select(ToTasksListDTO).ToList();
+            // // foreach(var item in _context.tasks.Where(t => t.done == false).AsEnumerable().GroupBy(t => t.tasksListId))
+            // // {
+            // //     TasksListDTO tasksListDTO = new TasksListDTO()
+            // //     {
+            // //         notDoneTasks = item.Count(), 
+            // //         tasksList = _context.taskLists
+            // //         .Where(l => l.tasksListId == item.Key)
+            // //         .Single() 
+            // //     };
+            // //     tasksListDTO.tasksList.tasks = null;
+            // //     dashboardDTO.taskLists.Add(tasksListDTO);            
+            // // }
+            // return dashboardDTO;
         }
+
+        // private TasksListDTO ToTasksListDTO(IGrouping<int, Task> groupList, int arg2)
+        // {
+        //     TasksListDTO tasksListDTO = new TasksListDTO();
+        //     tasksListDTO.notDoneTasks = groupList.Count();
+        //     tasksListDTO.tasksList = _context.taskLists
+        //         .Where(l => l.tasksListId == groupList.Key)
+        //         .Single(); 
+        //     tasksListDTO.tasksList.tasks = null;
+        //     return tasksListDTO;
+        // }
     }
 }

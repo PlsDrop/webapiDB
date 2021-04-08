@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace webapi
@@ -17,6 +18,9 @@ namespace webapi
     public class TasksList
     { 
         public int tasksListId { get; set; }
+
+        [Required]
+        [StringLength(100)]
         public string title { get; set; }
         public List<Task> tasks { get; set; }
     }
@@ -24,8 +28,15 @@ namespace webapi
     public class Task
     {
         public int taskId { get; set; }
+
+        [Required]
+        [StringLength(100)]
         public string title { get; set; }
+        
+        [StringLength(100)]
         public string description { get; set; }
+
+        [DataType(DataType.DateTime)]
         public DateTime? dueDate { get; set; }
         public bool done { get; set; }
 

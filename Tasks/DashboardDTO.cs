@@ -11,6 +11,9 @@ namespace webapi
     public class TasksListDTO
     {
         public int notDoneTasks { get; set; }
-        public TasksList tasksList { get; set; }
+        
+        public int id { get; set; }
+
+        public string title { get; set; }
     }
 }

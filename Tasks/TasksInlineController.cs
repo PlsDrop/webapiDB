@@ -42,8 +42,13 @@ namespace webapi
         [HttpPost("/inline/lists/{listId}/tasks")]
         public ActionResult<Task> AddTask(int listId, Task task)
         {   
-            Task createdTask = tasksListService.CreateTask(listId, task);
-            return Created($"/lists/{listId}/tasks/{createdTask.tasksListId}", createdTask);
+            // if (ModelState.IsValid)
+            // {
+                Console.WriteLine("test");
+                Task createdTask = tasksListService.CreateTask(listId, task);
+                return Created($"/lists/{listId}/tasks/{createdTask.tasksListId}", createdTask);
+            
+            // return StatusCodes.
         }
         
         [HttpPatch("/inline/lists/{listId}")]
