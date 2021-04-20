@@ -57,7 +57,7 @@ namespace webapi
             return task;
         }
 
-        internal Task PatchTask(int listId, int taskId, Task task)
+        internal Task PutTask(int listId, int taskId, Task task)
         {
             task.tasksListId = listId;
             task.taskId = taskId;
@@ -65,6 +65,13 @@ namespace webapi
             _context.SaveChanges();
             // .Where(t => (t.tasksListId == listId) && (t.taskId == taskId))
             return task;
+        }
+
+        internal string PatchTaskStatus(int listId, int taskId, TaskStatusDTO taskStatusDTO)
+        {
+            _context.tasks.Where(t => t.taskId == taskId).First().done = taskStatusDTO.done;
+            _context.SaveChanges();
+            return $"Status of task {taskId} set to {taskStatusDTO.done}";
         }
 
         internal void DeleteList(int listId)
@@ -89,6 +96,8 @@ namespace webapi
                 .Select(ToTodayTaskDTO)
                 .ToList();
         }
+
+        
 
         private TodayTaskDTO ToTodayTaskDTO(Task task)
         {   

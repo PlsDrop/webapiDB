@@ -56,10 +56,17 @@ namespace webapi
         }
 
         [HttpPut("/lists/{listId}/tasks/{taskId}")]
-        public ActionResult<Task> PatchTask(int listId, int taskId, Task task)
+        public ActionResult<Task> PutTask(int listId, int taskId, Task task)
         {
-            Task updatedTask = tasksListService.PatchTask(listId, taskId, task);
+            Task updatedTask = tasksListService.PutTask(listId, taskId, task);
             return Created($"/lists/{updatedTask.tasksListId}/tasks/{updatedTask.taskId}", updatedTask);
+        }
+
+        [HttpPatch("/lists/{listId}/tasks/{taskId}/mark")]
+        public ActionResult<string> PatchTaskStatus(int listId, int taskId, TaskStatusDTO taskStatusDTO)
+        {
+            string result = tasksListService.PatchTaskStatus(listId, taskId, taskStatusDTO);
+            return Ok(result);
         }
 
         [HttpDelete("/lists/{listId}")]
