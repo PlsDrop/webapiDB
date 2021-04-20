@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using System.Web.Http.Cors;
 
 namespace webapi
 {
     [ApiController]
     [Route("")]
+    //[EnableCors(origins: "http://mywebclient.azurewebsites.net", headers: "*", methods: "*")]
     public class TasksInlineController : ControllerBase
     {
         private TasksListService tasksListService;
@@ -42,11 +44,8 @@ namespace webapi
         [HttpPost("/lists/{listId}/tasks")]
         public ActionResult<Task> AddTask(int listId, Task task)
         {   
-   
-            Console.WriteLine("test");
             Task createdTask = tasksListService.CreateTask(listId, task);
             return Created($"/lists/{listId}/tasks/{createdTask.tasksListId}", createdTask);
-
         }
         
         [HttpPut("/lists/{listId}")]

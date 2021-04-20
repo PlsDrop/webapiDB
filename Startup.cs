@@ -12,11 +12,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System.Web.Http;
 
 namespace webapi
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+       
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,6 +30,7 @@ namespace webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<TasksDBContext>(options =>
                 options
                     .UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
@@ -36,6 +40,17 @@ namespace webapi
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );;
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                builder =>
+                {
+                    builder.WithOrigins("http://127.0.0.1:5500"); //адрес вашего лайв сервера или чо там у вас
+                    builder.AllowAnyHeader();
+                });
+            });
+
             services.AddScoped<TasksListService>();
             services.AddSwaggerGen(c =>
             {
@@ -53,6 +68,8 @@ namespace webapi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "webapi v1"));
             }
 
+            app.UseCors(MyAllowSpecificOrigins);    
+      
             app.UseRouting();
 
             app.UseAuthorization();
