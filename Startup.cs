@@ -48,6 +48,7 @@ namespace webapi
                 {
                     builder.WithOrigins("http://127.0.0.1:5500"); //адрес вашего лайв сервера или чо там у вас
                     builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
                 });
             });
 
