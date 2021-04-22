@@ -32,10 +32,12 @@ namespace webapi
             if(all)
                 return _context.tasks
                 .Where(t => (t.tasksListId == listId))
+                .OrderBy(t => t.taskId)
                 .ToList();
             else
                 return _context.tasks
                 .Where(t => (t.tasksListId == listId) && (t.done == false))
+                .OrderBy(t => t.taskId)
                 .ToList();
         }
 
